@@ -55,15 +55,17 @@ class Eshop {
     }
 
     //product
-    function addProduct ($product) {
-        $this->producs[] = $product;
+    function addProduct (Product $product) {
+        $this->products[] = $product;
     }
 
-    function removeProduct ($product) {
-        
+    function removeProduct (Product $product) {
+
+        $key = array_search($product, $this->products);
+        unset($this->products[$key]);
     }
 
-    function addCustomer ($customer) {
+    function addCustomer ( Customer $customer) {
         $this->customers[] = $customer;
     }
 };
@@ -127,7 +129,70 @@ class Beauty extends Product {
 
 class Customer {
     private $id;
+    private $name;
+    private $surname;
+    private $address;
+    private $creditCards = [];
+    private $payments =[];
+    private $orders = [];
+
+    function __construct(string $name, string $surname) {
+        $this->name =$name;
+        $this->surname=$surname;
+    }
+
+    function setAddress (string $address) {
+        $this->address = $address;
+    }
+
+    function setId ($id) {
+        $this->id = $id;
+    }
+
+    function setCreditCard ( CreditCard $creditCard) {
+        $this->creditCards[] = $creditCard;
+    }
+
+    function createOrder (Order $order){
+        $this->orders[] = $order;
+    }
 }
+
+class CreditCard {
+    private $ownerName;
+    private $bank;
+    private $serialNumber;
+
+    function __construct (string $name, string $bank, int $serialNumber) {
+        $this->ownerName = $name;
+        $this->bank = $bank;
+        $this->serialNumber = $serialNumber;
+    }
+
+    function getCreditCard(){
+        return array('bank'->$this->bank, 'serialNumber' ->$this->serialNumber);
+    }
+}
+
+class Order {
+    private $id;
+    private $total;
+    private $customerId;
+    private $statusOfPayment;
+    private $creditCard;
+    private $products= [];
+
+    function __construct (int $customerId, int $total){
+        $this->customerId = $customerId;
+        $this->total = $total;
+    }
+
+}
+
+
+
+// ----------------------------------------------------------
+
 
 $eshop1 = new Eshop ('Il super Bio', 'www.ilsuperbio.it', 23948123);
 
@@ -148,8 +213,6 @@ $food3 = new Food ('Crackers Integrali Farro Bio Plus', 4932847, 3 );
 $food1->setAvailable(5);
 $food2->setAvailable(10);
 $food3->setAvailable(8);
-
-
 $food1->showProduct();
 
 $eshop1->addProduct($supplement1);
@@ -157,7 +220,13 @@ $eshop1->addProduct($supplement2);
 $eshop1->addProduct($food1);
 $eshop1->addProduct($food2);
 
+$eshop1->removeProduct($food1);
 var_dump($eshop1);
 
+$client1 = new Customer ('Pia', 'Coccioli');
+$client1->setAddress('Via ponzio pilato, 33, neverland');
+var_dump($client1);
 
+$order1 = new Order (948273, 199);
 
+var_dump($order1);
