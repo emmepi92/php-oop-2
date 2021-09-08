@@ -8,13 +8,13 @@ Provate a far interagire tra di loro gli oggetti: ad esempio, l’utente dello s
 */
 
 class Eshop {
-    private $name;
-    private $website;
-    private $indirizzo;
-    private $partitaIva;
+    protected $name;
+    protected $website;
+    protected $indirizzo;
+    protected $partitaIva;
 
-    private $products = [];
-    private $customers = [];
+    protected $products = [];
+    protected $customers = [];
 
     //constructor
     function __construct (string $name, string $website, int $partitaIva){
@@ -74,7 +74,7 @@ class Product {
     protected $category;
     protected $id;
     protected $name;
-    protected $price = 0;
+    protected $price = 0;   //unico modo affinche la classe Order riesce a 'vederlo'
     protected $availability = 0;
 
     function changePrice (int $price){
@@ -91,6 +91,10 @@ class Product {
         echo "Prezzo: $this->price <br>";
         echo "Disponibilità: $this->availability <br> <hr>";
 
+    }
+
+    function getPrice () {
+        return $this->price;
     }
 }
 
@@ -168,25 +172,33 @@ class CreditCard {
         $this->bank = $bank;
         $this->serialNumber = $serialNumber;
     }
-
-    function getCreditCard(){
-        return array('bank'->$this->bank, 'serialNumber' ->$this->serialNumber);
-    }
 }
 
 class Order {
-    private $id;
-    private $total;
+
+    protected $id;
+    private $total = 0;
     private $customerId;
     private $statusOfPayment;
     private $creditCard;
     private $products= [];
 
-    function __construct (int $customerId, int $total){
+    function __construct (int $customerId, $products){
+        // $this->id; funzione che genera id automaticamente e in maniera cresciente
         $this->customerId = $customerId;
-        $this->total = $total;
+        $this->products = $products;
+        $this->getTotal();
     }
 
+    function getTotal () {        
+        foreach($this->products as $product) {
+            $this->total += $product->getPrice();
+        }
+    }
+
+    function showTotal () {
+        return $this->total;
+    }
 }
 
 
@@ -210,6 +222,8 @@ $food1 = new Food ('Crackers Integrali Segale Bio Plus', 4932845, 3 );
 $food2 = new Food ('Crackers Integrali Avena Bio Plus', 4932846, 4 );
 $food3 = new Food ('Crackers Integrali Farro Bio Plus', 4932847, 3 );
 
+var_dump($food1);
+
 $food1->setAvailable(5);
 $food2->setAvailable(10);
 $food3->setAvailable(8);
@@ -227,6 +241,5 @@ $client1 = new Customer ('Pia', 'Coccioli');
 $client1->setAddress('Via ponzio pilato, 33, neverland');
 var_dump($client1);
 
-$order1 = new Order (948273, 199);
-
+$order1 = new Order (948273, [$food1,$food2,$supplement1]);
 var_dump($order1);
